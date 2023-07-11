@@ -41,6 +41,16 @@ class Bird(pg.sprite.Sprite):
         self.dy = 4
         screen.blit(self.img, self.rect)
         
+    def change_img(self, num: int, screen: pg.Surface):
+        """
+        こうかとん画像を切り替え，画面に転送する
+        引数1 num:こうかとん画像ファイル名の番号
+        引数2 screen:画面Surface
+        """
+        self.img = pg.transform.rotozoom(pg.image.load(f"./fig/{num}.png"), 0, 2.5)
+        self.img = pg.transform.flip(self.img , True, False)
+        screen.blit(self.img, self.rect)
+        
 
         
 class Pipe(pg.sprite.Sprite):
@@ -97,7 +107,8 @@ def main():
     pipe = Pipe([400, 0], 0)
     score = Score()
     pips = pg.sprite.Group()
-
+    #score.score = 50 #←スコアが10で割れ切れるとき、無敵状態（当たり判定無し）
+    #score.score = 51　# ←スコアが10で割れ切れないとき、無敵状態じゃなくなる（当たり判定あり）
 
 
     tmr = 0 #timer = 0
@@ -108,8 +119,8 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return 0
-        if not bird.invulnerable :
-                
+            
+        if not bird.invulnerable :    
             if len(pg.sprite.spritecollide(bird, pips, True)) != 0:
                 return
         else :
@@ -126,12 +137,12 @@ def main():
         if score.score % 10 == 0 and score.score != 0 :# こうかとんが10枚ごとに（10の倍数になったときに）コインを取ったとき
             n_tmr = tmr #「今の経過時間 = これまでの経過時間」の場合
             bird.invulnerable = True #無敵状態
-        if tmr - n_tmr == 500: #「元々の時間 - 今の時間」　が５００フレーム（無敵状態５秒経過）になったときに
+            bird.change_img(6, screen)
+            
+        if tmr - n_tmr == 150: #「元々の時間 - 今の時間」　が150フレームになったときに
             bird.invulnerable = False #無敵状態じゃなくなる（土管の当たり判定再開）
-                
-            
-            
-            
+            bird.change_img(3, screen)
+
         
         # 背景移動 第一回参照                            
         screen.blit(bg_img, [-(tmr%3200), 0])
@@ -144,6 +155,10 @@ def main():
         pips.update()
         pips.draw(screen)
         score.update
+        
+        # チェック用　カウントされてスコアの判定が確認できる
+        # if tmr % 100 == 0:
+        #     score.score_up(1)
         
         pg.display.update()
         tmr += 1
