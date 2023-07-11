@@ -25,7 +25,7 @@ class Bird(pg.sprite.Sprite):
         self.img = pg.transform.flip(self.img0, True, False)
         self.rect = self.img.get_rect()
         self.rect.center = xy
-        self.dy = 4
+        self.dy = 7  
         
     def update(self, key_lst: list[bool], screen: pg.Surface):
         """
@@ -34,15 +34,21 @@ class Bird(pg.sprite.Sprite):
         引数2 screen:画面Surface
         """
         if key_lst[pg.K_SPACE]:
-            self.dy = -5
+            self.dy = -9
             
         self.rect.centery += self.dy
-        self.dy = 4
+        self.dy = 7
         screen.blit(self.img, self.rect)
         
 class Pipe(pg.sprite.Sprite):
     
     def __init__(self, xy: tuple[int, int], n):
+        """ 土管を生成する
+
+        Args:
+            xy (tuple[int, int]): _出現座標 画像左上
+            n (_type_): _1->下向きの土管 2->上向きの土管
+        """
         super().__init__()
         self.img0 = pg.transform.rotozoom(pg.image.load(f"./fig/dokan.png"), 0, 0.5)
         
@@ -60,12 +66,12 @@ class Pipe(pg.sprite.Sprite):
         土管をスクロールする(位置の更新)を行う
         """
         self.rect.centerx -= 2
+        if self.rect.right < 0:
+            self.kill()
         
 class Score:
     """
-    打ち落とした爆弾，敵機の数をスコアとして表示するクラス
-    爆弾:1点
-    敵機:10点
+    コインを獲得した時のスコアが増える
     """
     def __init__(self):
         self.font = pg.font.Font(None, 50)
@@ -111,7 +117,9 @@ def main():
         if tmr % 180 == 0: 
             r = random.randint(0, pipe.img0.get_height()//2)
             pips.add(Pipe([WIDTH+pipe.img0.get_width()//2, r], 0))
-            pips.add(Pipe([WIDTH+pipe.img0.get_width()//2, HEIGHT-r], 1))
+            pips.add(Pipe([WIDTH+pipe.img0.get_width()//2, r+(pipe.img0.get_height()+400)], 1))
+        
+        
         
         # 背景移動 第一回参照                            
         screen.blit(bg_img, [-(tmr%3200), 0])
@@ -123,10 +131,10 @@ def main():
         bird.update(key_lst, screen)
         pips.update()
         pips.draw(screen)
-        score.update
+        score.update(screen)
         
         pg.display.update()
-        tmr += 1
+        tmr += 1 
         clock.tick(100)
 
 
