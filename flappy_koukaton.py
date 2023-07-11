@@ -26,6 +26,7 @@ class Bird(pg.sprite.Sprite):
         self.rect = self.img.get_rect()
         self.rect.center = xy
         self.dy = 4
+        self.invulnerable = False #無敵状態のフラグを追加
         
     def update(self, key_lst: list[bool], screen: pg.Surface):
         """
@@ -39,6 +40,8 @@ class Bird(pg.sprite.Sprite):
         self.rect.centery += self.dy
         self.dy = 4
         screen.blit(self.img, self.rect)
+        
+
         
 class Pipe(pg.sprite.Sprite):
     
@@ -74,6 +77,7 @@ class Score:
         self.image = self.font.render(f"Score: {self.score}", 0, self.color)
         self.rect = self.image.get_rect()
         self.rect.center = 100, HEIGHT-50
+        
 
     def score_up(self, add):
         self.score += add
@@ -94,16 +98,22 @@ def main():
     score = Score()
     pips = pg.sprite.Group()
 
-    tmr = 0
+
+
+    tmr = 0 #timer = 0
+    n_tmr = 0 #now timer = 0
     clock = pg.time.Clock()
     while True:
         key_lst = pg.key.get_pressed()
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return 0
-            
-        if len(pg.sprite.spritecollide(bird, pips, True)) != 0:
-            return
+        if not bird.invulnerable :
+                
+            if len(pg.sprite.spritecollide(bird, pips, True)) != 0:
+                return
+        else :
+            pass
         
         if bird.rect.centery > HEIGHT:
             return
@@ -112,6 +122,16 @@ def main():
             r = random.randint(0, pipe.img0.get_height()//2)
             pips.add(Pipe([WIDTH+pipe.img0.get_width()//2, r], 0))
             pips.add(Pipe([WIDTH+pipe.img0.get_width()//2, HEIGHT-r], 1))
+            
+        if score.score % 10 == 0 and score.score != 0 :# こうかとんが10枚ごとに（10の倍数になったときに）コインを取ったとき
+            n_tmr = tmr #「今の経過時間 = これまでの経過時間」の場合
+            bird.invulnerable = True #無敵状態
+        if tmr - n_tmr == 500: #「元々の時間 - 今の時間」　が５００フレーム（無敵状態５秒経過）になったときに
+            bird.invulnerable = False #無敵状態じゃなくなる（土管の当たり判定再開）
+                
+            
+            
+            
         
         # 背景移動 第一回参照                            
         screen.blit(bg_img, [-(tmr%3200), 0])
