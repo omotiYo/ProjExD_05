@@ -25,7 +25,7 @@ class Bird(pg.sprite.Sprite):
         self.img = pg.transform.flip(self.img0, True, False)
         self.rect = self.img.get_rect()
         self.rect.center = xy
-        self.dy = 7  
+        self.dy = 7 
         
     def update(self, key_lst: list[bool], screen: pg.Surface):
         """
