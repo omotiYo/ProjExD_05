@@ -82,13 +82,8 @@ class Pipe(pg.sprite.Sprite):
         super().__init__()
 
 
-<<<<<<< HEAD
         self.img0 = pg.transform.rotozoom(pg.image.load(f"ProjExD_05/fig/dokan.png"), 0, 0.5)
 
-=======
-        self.img0 = pg.transform.rotozoom(pg.image.load(f"./fig/dokan.png"), 0, 0.5)
->>>>>>> 0a2774e7ca66ad2526293104b7f6e3eb37db2603
-        
         if n == 0: # 引数で0が指定されたら下向き
             self.image = pg.transform.flip(self.img0, False, True)
         elif n == 1: # 引数で1が指定されたら上向き
