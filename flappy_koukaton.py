@@ -21,11 +21,12 @@ class Bird(pg.sprite.Sprite):
         引数2 xy:こうかとん画像の位置座標タプル 
         """
         super().__init__()
-        self.img0 = pg.transform.rotozoom(pg.image.load(f"ProjExD_05/fig/{num}.png"), 0, 2.5)
+        self.img0 = pg.transform.rotozoom(pg.image.load(f"./ProjExD_05/fig/{num}.png"), 0, 2.5)
+
         self.img = pg.transform.flip(self.img0, True, False)
         self.rect = self.img.get_rect()
         self.rect.center = xy
-        self.dy = 4
+        self.dy = 7 
         
     def update(self, key_lst: list[bool], screen: pg.Surface , vel: int,vel_j :int):
         """
@@ -36,6 +37,7 @@ class Bird(pg.sprite.Sprite):
         引数4 vel_j 上方向の速度
         """
         if key_lst[pg.K_SPACE]:
+
             self.dy = vel_j
             
         self.rect.centery += self.dy
@@ -52,13 +54,23 @@ class Bird(pg.sprite.Sprite):
             self.dy = -10
             
         self.rect.centery += self.dy
+
         screen.blit(self.img, self.rect)
         
 class Pipe(pg.sprite.Sprite):
     
     def __init__(self, xy: tuple[int, int], n):
+        """ 土管を生成する
+
+        Args:
+            xy (tuple[int, int]): _出現座標 画像左上
+            n (_type_): _1->下向きの土管 2->上向きの土管
+        """
         super().__init__()
-        self.img0 = pg.transform.rotozoom(pg.image.load(f"ProjExD_05/fig/dokan.png"), 0, 0.5)
+
+
+        self.img0 = pg.transform.rotozoom(pg.image.load(f"./ProjExD_05/fig/dokan.png"), 0, 0.5)
+
         
         if n == 0: # 引数で0が指定されたら下向き
             self.image = pg.transform.flip(self.img0, False, True)
@@ -74,13 +86,61 @@ class Pipe(pg.sprite.Sprite):
         土管をスクロールする(位置の更新)を行う
         """
         self.rect.centerx -= 2
-          
+
+        if self.rect.right < 0:
+            self.kill()
+
 class Score:
     """
-    打ち落とした爆弾，敵機の数をスコアとして表示するクラス
-    爆弾:1点
-    敵機:10点
+    コインを獲得した時のスコアが増える
     """
+
+class Coin(pg.sprite.Sprite):
+    """
+    コインに関するクラス
+    """
+    def __init__(self,xy: tuple[int,int]):
+        """
+        コイン画像Surfaceを生成する
+        引数 xy:コイン画像の位置座標タプル
+        """
+        super().__init__()
+        self.imgc = pg.transform.rotozoom(pg.image.load(f"ex05/fig/coin.png"),0,0.08)
+        self.image = pg.transform.flip(self.imgc, False, False)
+        self.rect = self.image.get_rect()
+        self.rect.center = xy
+        self.tmr = 0
+
+    def update(self):
+        """
+        位置の更新
+        """
+        self.rect.centerx -= 2
+
+class CoinRare(pg.sprite.Sprite):
+    """
+    レアコインに関するクラス
+    """
+    def __init__(self,xy: tuple[int,int]):
+        """
+        レアコイン画像Surfaceを生成する
+        引数 xy:レアコイン画像の位置座標タプル
+        """
+        super().__init__()
+        self.imgp = pg.transform.rotozoom(pg.image.load(f"ex05/fig/coinpink.png"),0,0.04)
+        self.image = pg.transform.flip(self.imgp, False, False)
+        self.rect = self.image.get_rect()
+        self.rect.center = xy
+        self.tmr = 0
+
+    def update(self):
+        """
+        位置の更新
+        """
+        self.rect.centerx -= 2
+        
+
+class Score:
     def __init__(self):
         self.font = pg.font.Font(None, 50)
         self.color = (0, 0, 255)
@@ -95,7 +155,15 @@ class Score:
     def update(self, screen: pg.Surface):
         self.image = self.font.render(f"Score: {self.score}", 0, self.color)
         screen.blit(self.image, self.rect)
+       
+    # ゲームオーバ時のスコア表示
+    def gameover(self, screen: pg.Surface):
+        self.font = pg.font.Font(None, 100)
+        self.rect.center = WIDTH/2+50, HEIGHT/2+100
+        self.image = self.font.render(f"{self.score}", 0, self.color)
+        screen.blit(self.image, self.rect)
 
+        
 class GoodItem(pg.sprite.Sprite):
     """
     土管を3個超えるごとにgoodItemを表示するクラス 
@@ -133,15 +201,24 @@ class BadItem(pg.sprite.Sprite):
         アイテムをスクロールする（位置の更新）を行う
         """
         self.rect.centerx -= 2
+
+    
+        
+
         
 def main():
     pg.display.set_caption("flappy koukaton")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
-    bg_img = pg.image.load("ProjExD_05/fig/pg_bg.jpg")
+
+    bg_img = pg.image.load("./ProjExD_05/fig/pg_bg.jpg")
+    # gameover画像
+    gameover_img = pg.transform.rotozoom(pg.image.load("./ProjExD_05/fig/gameover.png"), 0, 0.3)
+
     bg_r_img = pg.transform.flip(bg_img, True, False)
     
     bird = Bird(3, (400, HEIGHT//3))
     pipe = Pipe([400, 0], 0)
+
     g_item = GoodItem([400,0])
     b_item = BadItem([400,0])
     score = Score()
@@ -150,7 +227,13 @@ def main():
     b_items = pg.sprite.Group()
     diff_timer = 0
     flag = 0
-    
+
+    coin = Coin([400, 0])
+    coinrare = CoinRare([400,0])
+    coins = pg.sprite.Group()
+    coinsrare = pg.sprite.Group()
+
+
     tmr = 0
     clock = pg.time.Clock()
     while True:
@@ -160,6 +243,10 @@ def main():
                 return 0
             
         if len(pg.sprite.spritecollide(bird, pips, True)) != 0:
+            screen.blit(gameover_img, [WIDTH/2-350, HEIGHT/2-450])
+            score.gameover(screen)
+            pg.display.update()
+            time.sleep(3) # gameoverを表示した後、3秒待つ
             return
         
         if bird.rect.centery > HEIGHT:
@@ -169,8 +256,7 @@ def main():
         if tmr % 180 == 0: 
             r = random.randint(0, pipe.img0.get_height()//2)
             pips.add(Pipe([WIDTH+pipe.img0.get_width()//2, r], 0))
-            pips.add(Pipe([WIDTH+pipe.img0.get_width()//2, HEIGHT-r], 1))
-            
+
             if tmr % 540 == 0:# Goodアイテムの生成
                 g_items.add(GoodItem([WIDTH+pipe.img0.get_width()//2, r+210]))
             
@@ -179,6 +265,27 @@ def main():
 
         g_items.add(g_item)
         b_items.add(b_item)
+
+            pips.add(Pipe([WIDTH+pipe.img0.get_width()//2, r+(pipe.img0.get_height()+400)], 1))
+        
+        
+        
+        if tmr % 500 == 1:  #500フレームに1回ランダムな位置にコインを表示させる　土管と重ならないように調整
+            r = random.randint(300, 600)
+            coins.add(Coin([WIDTH+coin.imgc.get_width()//2, r]))
+
+        if tmr % 540 == 0:  #540フレームに1回ランダムな位置にレアコインを表示させる　土管と重ならないように調整
+            r = random.randint(50, pipe.img0.get_height()//2)
+            coinsrare.add(CoinRare([WIDTH+coinrare.imgp.get_width()//2+200, r]))  #上側に表示
+        elif tmr % 540 ==270:
+            r2 = random.randint(100, pipe.img0.get_height()//2)
+            coinsrare.add(CoinRare([WIDTH+coinrare.imgp.get_width()//2, HEIGHT-r2]))  #下側に表示
+
+        if len(pg.sprite.spritecollide(bird, coins, True)) != 0:  #こうかとんがコインをゲットしたらスコアが1アップ
+            score.score_up(1)
+
+        if len(pg.sprite.spritecollide(bird, coinsrare, True)) != 0:  #こうかとんがレアコインをゲットしたらスコアが10アップ
+            score.score_up(10)
 
         # 背景移動 第一回参照                            
         screen.blit(bg_img, [-(tmr%3200), 0])
@@ -207,25 +314,24 @@ def main():
         if not flag:
             bird.update(key_lst, screen,7,-6)
 
-            
-        
-
-    
-        
-        
-
-
         
         pips.update()
         pips.draw(screen)
-        score.update
+        
         g_items.update()
         g_items.draw(screen)
         b_items.update()
         b_items.draw(screen)
+
+
+        coins.update()
+        coins.draw(screen)
+        coinsrare.update()
+        coinsrare.draw(screen) 
+        score.update(screen)
         
         pg.display.update()
-        tmr += 1
+        tmr += 1 
         clock.tick(100)
 
 
