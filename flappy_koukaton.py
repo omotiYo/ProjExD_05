@@ -83,7 +83,6 @@ class Pipe(pg.sprite.Sprite):
 
 
         self.img0 = pg.transform.rotozoom(pg.image.load(f"./fig/dokan.png"), 0, 0.5)
-
         
         if n == 0: # 引数で0が指定されたら下向き
             self.image = pg.transform.flip(self.img0, False, True)
@@ -103,10 +102,6 @@ class Pipe(pg.sprite.Sprite):
         if self.rect.right < 0:
             self.kill()
 
-class Score:
-    """
-    コインを獲得した時のスコアが増える
-    """
 
 class Coin(pg.sprite.Sprite):
     """
@@ -163,10 +158,11 @@ class Score:
         self.image = self.font.render(f"Score: {self.score}", 0, self.color)
         self.rect = self.image.get_rect()
         self.rect.center = 100, HEIGHT-50
-        
+        self.scorecounter = 0
 
     def score_up(self, add):
         self.score += add
+        self.scorecounter += 1
 
     def update(self, screen: pg.Surface):
         self.image = self.font.render(f"Score: {self.score}", 0, self.color)
@@ -284,15 +280,18 @@ def main():
         g_items.add(g_item)
         b_items.add(b_item)  
             
-        if score.score % 10 == 0 and score.score != 0 :# こうかとんが10枚ごとに（10の倍数になったときに）コインを取ったとき
+        if score.scorecounter % 4 == 0 and score.scorecounter != 0:# こうかとんが4枚ごとにコインを取ったとき
             n_tmr = tmr #「今の経過時間 = これまでの経過時間」の場合
             bird.invulnerable = True #無敵状態
             bird.change_img(6, screen)
             
-        if tmr - n_tmr == 150: #「元々の時間 - 今の時間」　が150フレームになったときに
+            
+        if tmr - n_tmr == 300: #「元々の時間 - 今の時間」が300フレームになったときに #150短かった.....
             bird.invulnerable = False #無敵状態じゃなくなる（土管の当たり判定再開）
             bird.change_img(3, screen)
         
+
+
         if tmr % 500 == 1:  #500フレームに1回ランダムな位置にコインを表示させる　土管と重ならないように調整
             r = random.randint(350, 550)
             coins.add(Coin([WIDTH+coin.imgc.get_width()//2, r]))
@@ -300,9 +299,13 @@ def main():
         if tmr % 540 == 0:  #540フレームに1回ランダムな位置にレアコインを表示させる　土管と重ならないように調整
             r = random.randint(50, pipe.img0.get_height()//2)
             coinsrare.add(CoinRare([WIDTH+coinrare.imgp.get_width()//2+200, r]))  #上側に表示
-        elif tmr % 540 ==270:
+            
+        elif tmr % 540 == 270:
             r2 = random.randint(100, pipe.img0.get_height()//2)
             coinsrare.add(CoinRare([WIDTH+coinrare.imgp.get_width()//2, HEIGHT-r2]))  #下側に表示
+
+
+
 
         if len(pg.sprite.spritecollide(bird, coins, True)) != 0:  #こうかとんがコインをゲットしたらスコアが1アップ
             score.score_up(1)
