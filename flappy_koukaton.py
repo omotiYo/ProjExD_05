@@ -21,7 +21,7 @@ class Bird(pg.sprite.Sprite):
         引数2 xy:こうかとん画像の位置座標タプル 
         """
         super().__init__()
-        self.img0 = pg.transform.rotozoom(pg.image.load(f"./ProjExD_05/fig/{num}.png"), 0, 2.5)
+        self.img0 = pg.transform.rotozoom(pg.image.load(f"./fig/{num}.png"), 0, 2.5)
 
         self.img = pg.transform.flip(self.img0, True, False)
         self.rect = self.img.get_rect()
@@ -82,7 +82,7 @@ class Pipe(pg.sprite.Sprite):
         super().__init__()
 
 
-        self.img0 = pg.transform.rotozoom(pg.image.load(f"./ProjExD_05/fig/dokan.png"), 0, 0.5)
+        self.img0 = pg.transform.rotozoom(pg.image.load(f"./fig/dokan.png"), 0, 0.5)
 
         
         if n == 0: # 引数で0が指定されたら下向き
@@ -118,7 +118,7 @@ class Coin(pg.sprite.Sprite):
         引数 xy:コイン画像の位置座標タプル
         """
         super().__init__()
-        self.imgc = pg.transform.rotozoom(pg.image.load(f"ex05/fig/coin.png"),0,0.08)
+        self.imgc = pg.transform.rotozoom(pg.image.load(f"./fig/coin.png"),0,0.08)
         self.image = pg.transform.flip(self.imgc, False, False)
         self.rect = self.image.get_rect()
         self.rect.center = xy
@@ -140,7 +140,7 @@ class CoinRare(pg.sprite.Sprite):
         引数 xy:レアコイン画像の位置座標タプル
         """
         super().__init__()
-        self.imgp = pg.transform.rotozoom(pg.image.load(f"ex05/fig/coinpink.png"),0,0.04)
+        self.imgp = pg.transform.rotozoom(pg.image.load(f"./fig/coinpink.png"),0,0.04)
         self.image = pg.transform.flip(self.imgp, False, False)
         self.rect = self.image.get_rect()
         self.rect.center = xy
@@ -169,7 +169,7 @@ class Score:
     def update(self, screen: pg.Surface):
         self.image = self.font.render(f"Score: {self.score}", 0, self.color)
         screen.blit(self.image, self.rect)
-       
+
     # ゲームオーバ時のスコア表示
     def gameover(self, screen: pg.Surface):
         self.font = pg.font.Font(None, 100)
@@ -186,7 +186,7 @@ class GoodItem(pg.sprite.Sprite):
     """
     def __init__(self, xy: tuple[int, int]):
         super().__init__()
-        self.image = pg.transform.rotozoom(pg.image.load(f"ProjExD_05/fig/good_item.png"), 0, 0.05)
+        self.image = pg.transform.rotozoom(pg.image.load(f"./fig/good_item.png"), 0, 0.05)
         self.rect = self.image.get_rect()
         self.rect.center = xy
         self.tmr = 0
@@ -205,7 +205,7 @@ class BadItem(pg.sprite.Sprite):
     """
     def __init__(self, xy: tuple[int, int]):
         super().__init__()
-        self.image = pg.transform.rotozoom(pg.image.load(f"ProjExD_05/fig/bad_item.png"), 0, 0.05)
+        self.image = pg.transform.rotozoom(pg.image.load(f"./fig/bad_item.png"), 0, 0.05)
         self.rect = self.image.get_rect()
         self.rect.center = xy
         self.tmr = 0
@@ -216,17 +216,14 @@ class BadItem(pg.sprite.Sprite):
         """
         self.rect.centerx -= 2
 
-    
-        
-
         
 def main():
     pg.display.set_caption("flappy koukaton")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
 
-    bg_img = pg.image.load("./ProjExD_05/fig/pg_bg.jpg")
+    bg_img = pg.image.load("./fig/pg_bg.jpg")
     # gameover画像
-    gameover_img = pg.transform.rotozoom(pg.image.load("./ProjExD_05/fig/gameover.png"), 0, 0.3)
+    gameover_img = pg.transform.rotozoom(pg.image.load("./fig/gameover.png"), 0, 0.3)
 
     bg_r_img = pg.transform.flip(bg_img, True, False)
     
@@ -273,8 +270,7 @@ def main():
         
         if bird.rect.centery > HEIGHT:
             return
-        
-       
+
         if tmr % 180 == 0: 
             r = random.randint(0, pipe.img0.get_height()//2)
             pips.add(Pipe([WIDTH+pipe.img0.get_width()//2, r], 0))
