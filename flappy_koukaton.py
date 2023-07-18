@@ -228,8 +228,6 @@ def main():
     bird = Bird(3, (400, HEIGHT//3))
     pipe = Pipe([400, 0], 0)
 
-    g_item = GoodItem([400,0])
-    b_item = BadItem([400,0])
     score = Score()
     pips = pg.sprite.Group()
 
@@ -260,25 +258,28 @@ def main():
                 pg.display.update()
                 time.sleep(3)
                 return
+        if  0 > bird.rect.centery or bird.rect.centery > HEIGHT:
+            screen.blit(gameover_img, [WIDTH/2-350, HEIGHT/2-450])
+            score.gameover(screen)
+            pg.display.update()
+            time.sleep(3)
+            return
         else :
             pass
         
-        if bird.rect.centery > HEIGHT:
-            return
+        
 
         if tmr % 180 == 0: 
             r = random.randint(0, pipe.img0.get_height()//2)
+            rp = random.randint(180, 650) # アイテム用
             pips.add(Pipe([WIDTH+pipe.img0.get_width()//2, r], 0))
             pips.add(Pipe([WIDTH+pipe.img0.get_width()//2, r+(pipe.img0.get_height()+400)], 1))   
 
-            if tmr % 540 == 0:# Goodアイテムの生成
-                g_items.add(GoodItem([WIDTH+pipe.img0.get_width()//2, r+210]))
+            if tmr % 540 == 0 and not tmr % 2160 == 0:# Goodアイテムの生成
+                g_items.add(GoodItem([WIDTH+pipe.img0.get_width()//2, r+rp]))
             
             if tmr % 720 == 0:# Badアイテムの生成
-                b_items.add(BadItem([WIDTH+pipe.img0.get_width()//2, r+210]))
-
-        g_items.add(g_item)
-        b_items.add(b_item)  
+                b_items.add(BadItem([WIDTH+pipe.img0.get_width()//2, r+rp])) 
             
         if score.scorecounter % 4 == 0 and score.scorecounter != 0:# こうかとんが4枚ごとにコインを取ったとき
             n_tmr = tmr #「今の経過時間 = これまでの経過時間」の場合
@@ -286,17 +287,17 @@ def main():
             bird.change_img(6, screen)
             
             
-        if tmr - n_tmr == 300: #「元々の時間 - 今の時間」が300フレームになったときに #150短かった.....
+        if tmr - n_tmr == 300: #「元々の時間 - 今の時間」が300フレームになったときに #150だと短かった.....
             bird.invulnerable = False #無敵状態じゃなくなる（土管の当たり判定再開）
             bird.change_img(3, screen)
         
 
 
-        if tmr % 500 == 1:  #500フレームに1回ランダムな位置にコインを表示させる　土管と重ならないように調整
+        if tmr % 500 == 1:  #500フレームに1回ランダムな位置にコインを表示させる 土管と重ならないように調整
             r = random.randint(350, 550)
             coins.add(Coin([WIDTH+coin.imgc.get_width()//2, r]))
 
-        if tmr % 540 == 0:  #540フレームに1回ランダムな位置にレアコインを表示させる　土管と重ならないように調整
+        if tmr % 540 == 0:  #540フレームに1回ランダムな位置にレアコインを表示させる 土管と重ならないように調整
             r = random.randint(50, pipe.img0.get_height()//2)
             coinsrare.add(CoinRare([WIDTH+coinrare.imgp.get_width()//2+200, r]))  #上側に表示
             
@@ -306,18 +307,19 @@ def main():
 
 
 
-
         if len(pg.sprite.spritecollide(bird, coins, True)) != 0:  #こうかとんがコインをゲットしたらスコアが1アップ
             score.score_up(1)
 
         if len(pg.sprite.spritecollide(bird, coinsrare, True)) != 0:  #こうかとんがレアコインをゲットしたらスコアが10アップ
             score.score_up(10)
 
+
         # 背景移動 第一回参照                            
         screen.blit(bg_img, [-(tmr%3200), 0])
         screen.blit(bg_r_img, [3200-(tmr%3200), 0])
         screen.blit(bg_r_img, [-(tmr%3200), 0])
         screen.blit(bg_img, [1600-(tmr%3200), 0])
+
 
         if len(pg.sprite.spritecollide(bird, g_items, True)) != 0:#g_itemsに触ったら
             diff_timer = tmr
@@ -326,6 +328,7 @@ def main():
         if len(pg.sprite.spritecollide(bird, b_items, True)) != 0:#b_itemsに触ったら
             diff_timer = tmr
             flag = 2
+
 
         if tmr >= 300 and (tmr - diff_timer) < 300:
             if flag == 1: #g_mode
@@ -340,7 +343,6 @@ def main():
         if not flag:
             bird.update(key_lst, screen,7,-6)
 
-        
         pips.update()
         pips.draw(screen)
         
@@ -349,16 +351,11 @@ def main():
         b_items.update()
         b_items.draw(screen)
 
-
         coins.update()
         coins.draw(screen)
         coinsrare.update()
         coinsrare.draw(screen) 
         score.update(screen)
-        
-        # チェック用　カウントされてスコアの判定が確認できる
-        #if tmr % 100 == 0:
-        #     score.score_up(1)
         
         pg.display.update()
         tmr += 1 
