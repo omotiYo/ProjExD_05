@@ -140,7 +140,9 @@ class CoinRare(pg.sprite.Sprite):
         引数 xy:レアコイン画像の位置座標タプル
         """
         super().__init__()
+
         self.imgp = pg.transform.rotozoom(pg.image.load(f"./fig/coinpink.png"),0,0.04)
+
         self.image = pg.transform.flip(self.imgp, False, False)
         self.rect = self.image.get_rect()
         self.rect.center = xy
@@ -274,7 +276,7 @@ def main():
         if tmr % 180 == 0: 
             r = random.randint(0, pipe.img0.get_height()//2)
             pips.add(Pipe([WIDTH+pipe.img0.get_width()//2, r], 0))
-
+            pips.add(Pipe([WIDTH+pipe.img0.get_width()//2, r+(pipe.img0.get_height()+400)], 1))   
 
             if tmr % 540 == 0:# Goodアイテムの生成
                 g_items.add(GoodItem([WIDTH+pipe.img0.get_width()//2, r+210]))
@@ -286,7 +288,7 @@ def main():
         b_items.add(b_item)
 
 
-        pips.add(Pipe([WIDTH+pipe.img0.get_width()//2, r+(pipe.img0.get_height()+400)], 1))
+        
 
             
         if score.score % 10 == 0 and score.score != 0 :# こうかとんが10枚ごとに（10の倍数になったときに）コインを取ったとき
@@ -299,7 +301,7 @@ def main():
             bird.change_img(3, screen)
         
         if tmr % 500 == 1:  #500フレームに1回ランダムな位置にコインを表示させる　土管と重ならないように調整
-            r = random.randint(300, 600)
+            r = random.randint(350, 550)
             coins.add(Coin([WIDTH+coin.imgc.get_width()//2, r]))
 
         if tmr % 540 == 0:  #540フレームに1回ランダムな位置にレアコインを表示させる　土管と重ならないように調整
