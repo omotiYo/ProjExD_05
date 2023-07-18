@@ -111,7 +111,7 @@ def main():
     #score.score = 51　# ←スコアが10で割れ切れないとき、無敵状態じゃなくなる（当たり判定あり）
 
 
-    tmr = 0 #timer = 0
+    tmr = 0 #timer = 0　
     n_tmr = 0 #now timer = 0
     clock = pg.time.Clock()
     while True:
@@ -157,7 +157,7 @@ def main():
         score.update
         
         # チェック用　カウントされてスコアの判定が確認できる
-        # if tmr % 100 == 0:
+        #if tmr % 100 == 0:
         #     score.score_up(1)
         
         pg.display.update()
