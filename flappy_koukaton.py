@@ -27,6 +27,7 @@ class Bird(pg.sprite.Sprite):
         self.rect = self.img.get_rect()
         self.rect.center = xy
         self.dy = 7 
+        self.invulnerable = False #無敵状態のフラグを追加
         
     def update(self, key_lst: list[bool], screen: pg.Surface , vel: int,vel_j :int):
         """
@@ -56,6 +57,18 @@ class Bird(pg.sprite.Sprite):
         self.rect.centery += self.dy
 
         screen.blit(self.img, self.rect)
+        
+    def change_img(self, num: int, screen: pg.Surface):
+        """
+        こうかとん画像を切り替え，画面に転送する
+        引数1 num:こうかとん画像ファイル名の番号
+        引数2 screen:画面Surface
+        """
+        self.img = pg.transform.rotozoom(pg.image.load(f"./fig/{num}.png"), 0, 2.5)
+        self.img = pg.transform.flip(self.img , True, False)
+        screen.blit(self.img, self.rect)
+        
+
         
 class Pipe(pg.sprite.Sprite):
     
@@ -148,6 +161,7 @@ class Score:
         self.image = self.font.render(f"Score: {self.score}", 0, self.color)
         self.rect = self.image.get_rect()
         self.rect.center = 100, HEIGHT-50
+        
 
     def score_up(self, add):
         self.score += add
@@ -223,6 +237,7 @@ def main():
     b_item = BadItem([400,0])
     score = Score()
     pips = pg.sprite.Group()
+
     g_items = pg.sprite.Group()
     b_items = pg.sprite.Group()
     diff_timer = 0
@@ -234,14 +249,21 @@ def main():
     coinsrare = pg.sprite.Group()
 
 
-    tmr = 0
+    tmr = 0 #timer = 0　
+    n_tmr = 0 #now timer = 0
     clock = pg.time.Clock()
     while True:
         key_lst = pg.key.get_pressed()
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return 0
-            
+
+        if not bird.invulnerable :    
+            if len(pg.sprite.spritecollide(bird, pips, True)) != 0:
+                return
+        else :
+            pass
+
         if len(pg.sprite.spritecollide(bird, pips, True)) != 0:
             screen.blit(gameover_img, [WIDTH/2-350, HEIGHT/2-450])
             score.gameover(screen)
@@ -257,6 +279,7 @@ def main():
             r = random.randint(0, pipe.img0.get_height()//2)
             pips.add(Pipe([WIDTH+pipe.img0.get_width()//2, r], 0))
 
+
             if tmr % 540 == 0:# Goodアイテムの生成
                 g_items.add(GoodItem([WIDTH+pipe.img0.get_width()//2, r+210]))
             
@@ -266,9 +289,18 @@ def main():
         g_items.add(g_item)
         b_items.add(b_item)
 
-            pips.add(Pipe([WIDTH+pipe.img0.get_width()//2, r+(pipe.img0.get_height()+400)], 1))
-        
-        
+
+        pips.add(Pipe([WIDTH+pipe.img0.get_width()//2, r+(pipe.img0.get_height()+400)], 1))
+
+            
+        if score.score % 10 == 0 and score.score != 0 :# こうかとんが10枚ごとに（10の倍数になったときに）コインを取ったとき
+            n_tmr = tmr #「今の経過時間 = これまでの経過時間」の場合
+            bird.invulnerable = True #無敵状態
+            bird.change_img(6, screen)
+            
+        if tmr - n_tmr == 150: #「元々の時間 - 今の時間」　が150フレームになったときに
+            bird.invulnerable = False #無敵状態じゃなくなる（土管の当たり判定再開）
+            bird.change_img(3, screen)
         
         if tmr % 500 == 1:  #500フレームに1回ランダムな位置にコインを表示させる　土管と重ならないように調整
             r = random.randint(300, 600)
@@ -329,6 +361,10 @@ def main():
         coinsrare.update()
         coinsrare.draw(screen) 
         score.update(screen)
+        
+        # チェック用　カウントされてスコアの判定が確認できる
+        #if tmr % 100 == 0:
+        #     score.score_up(1)
         
         pg.display.update()
         tmr += 1 
