@@ -21,7 +21,7 @@ class Bird(pg.sprite.Sprite):
         引数2 xy:こうかとん画像の位置座標タプル 
         """
         super().__init__()
-        self.img0 = pg.transform.rotozoom(pg.image.load(f"./fig/{num}.png"), 0, 2.5)
+        self.img0 = pg.transform.rotozoom(pg.image.load(f"ProjExD_05/fig/{num}.png"), 0, 2.5)
         self.img = pg.transform.flip(self.img0, True, False)
         self.rect = self.img.get_rect()
         self.rect.center = xy
@@ -58,7 +58,7 @@ class Pipe(pg.sprite.Sprite):
     
     def __init__(self, xy: tuple[int, int], n):
         super().__init__()
-        self.img0 = pg.transform.rotozoom(pg.image.load(f"./fig/dokan.png"), 0, 0.5)
+        self.img0 = pg.transform.rotozoom(pg.image.load(f"ProjExD_05/fig/dokan.png"), 0, 0.5)
         
         if n == 0: # 引数で0が指定されたら下向き
             self.image = pg.transform.flip(self.img0, False, True)
@@ -104,7 +104,7 @@ class GoodItem(pg.sprite.Sprite):
     """
     def __init__(self, xy: tuple[int, int]):
         super().__init__()
-        self.image = pg.transform.rotozoom(pg.image.load(f"./fig/good_item.png"), 0, 0.05)
+        self.image = pg.transform.rotozoom(pg.image.load(f"ProjExD_05/fig/good_item.png"), 0, 0.05)
         self.rect = self.image.get_rect()
         self.rect.center = xy
         self.tmr = 0
@@ -123,7 +123,7 @@ class BadItem(pg.sprite.Sprite):
     """
     def __init__(self, xy: tuple[int, int]):
         super().__init__()
-        self.image = pg.transform.rotozoom(pg.image.load(f"./fig/bad_item.png"), 0, 0.05)
+        self.image = pg.transform.rotozoom(pg.image.load(f"ProjExD_05/fig/bad_item.png"), 0, 0.05)
         self.rect = self.image.get_rect()
         self.rect.center = xy
         self.tmr = 0
@@ -137,7 +137,7 @@ class BadItem(pg.sprite.Sprite):
 def main():
     pg.display.set_caption("flappy koukaton")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
-    bg_img = pg.image.load("./fig/pg_bg.jpg")
+    bg_img = pg.image.load("ProjExD_05/fig/pg_bg.jpg")
     bg_r_img = pg.transform.flip(bg_img, True, False)
     
     bird = Bird(3, (400, HEIGHT//3))
