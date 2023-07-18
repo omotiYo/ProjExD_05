@@ -106,7 +106,7 @@ class CoinRare(pg.sprite.Sprite):
         引数 xy:レアコイン画像の位置座標タプル
         """
         super().__init__()
-        self.imgp = pg.transform.rotozoom(pg.image.load(f"ex05/fig/coinpink.png"),0,0.04)
+        self.imgp = pg.transform.rotozoom(pg.image.load(f"ex05/fig/coinpink.png"),0,0.03)
         self.image = pg.transform.flip(self.imgp, False, False)
         self.rect = self.image.get_rect()
         self.rect.center = xy
@@ -173,7 +173,7 @@ def main():
         
         
         if tmr % 500 == 1:  #500フレームに1回ランダムな位置にコインを表示させる　土管と重ならないように調整
-            r = random.randint(300, 600)
+            r = random.randint(350, 550)
             coins.add(Coin([WIDTH+coin.imgc.get_width()//2, r]))
 
         if tmr % 540 == 0:  #540フレームに1回ランダムな位置にレアコインを表示させる　土管と重ならないように調整
