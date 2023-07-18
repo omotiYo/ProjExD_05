@@ -259,16 +259,13 @@ def main():
 
         if not bird.invulnerable :    
             if len(pg.sprite.spritecollide(bird, pips, True)) != 0:
+                screen.blit(gameover_img, [WIDTH/2-350, HEIGHT/2-450])
+                score.gameover(screen)
+                pg.display.update()
+                time.sleep(3)
                 return
         else :
             pass
-
-        if len(pg.sprite.spritecollide(bird, pips, True)) != 0:
-            screen.blit(gameover_img, [WIDTH/2-350, HEIGHT/2-450])
-            score.gameover(screen)
-            pg.display.update()
-            time.sleep(3) # gameoverを表示した後、3秒待つ
-            return
         
         if bird.rect.centery > HEIGHT:
             return
@@ -285,11 +282,7 @@ def main():
                 b_items.add(BadItem([WIDTH+pipe.img0.get_width()//2, r+210]))
 
         g_items.add(g_item)
-        b_items.add(b_item)
-
-
-        
-
+        b_items.add(b_item)  
             
         if score.score % 10 == 0 and score.score != 0 :# こうかとんが10枚ごとに（10の倍数になったときに）コインを取ったとき
             n_tmr = tmr #「今の経過時間 = これまでの経過時間」の場合
